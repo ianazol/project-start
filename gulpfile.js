@@ -6,6 +6,7 @@ const sass = require('gulp-sass');
 const sourcemaps = require('gulp-sourcemaps');
 const cssmin = require('gulp-minify-css');
 const prefixer = require('gulp-autoprefixer');
+//const rigger = require('gulp-rigger');
 const del = require('del');
 const browserSync = require("browser-sync").create();
 const rename = require("gulp-rename");
@@ -17,6 +18,7 @@ const imagemin = require('gulp-imagemin');
 const newer = require('gulp-newer');
 const sassdoc = require('sassdoc');
 const svg = require('gulp-svg-sprite');
+const uglify = require('gulp-uglify');
 
 const isDevelopment = !process.env.NODE_ENV || process.env.NODE_ENV == 'development';
 
@@ -135,7 +137,9 @@ gulp.task('webpack', function(callback){
             main: `./main`
         },
         output: {
-            publicPath: '/js/'
+            publicPath: '/js/',
+            libraryTarget: 'var',
+            library: "Main"
         },
         watch: isDevelopment,
         devtool: isDevelopment ? 'cheap-module-inline-source-map' : null,
@@ -156,7 +160,7 @@ gulp.task('webpack', function(callback){
             errorHandler: notify.onError()
         }))
         .pipe(webpackStream(options, null, done))
-        //.pipe(gulpIf(!isDevelopment, uglify()))
+        .pipe(gulpIf(!isDevelopment, uglify()))
         .pipe(rename('main.js'))
         .pipe(gulp.dest(path.build.js))
         .on('data', function() {
@@ -180,7 +184,7 @@ gulp.task('build', gulp.parallel('css:build', 'assets:build', 'svg:build', 'js:b
 
 gulp.task('webserver', function(){
     browserSync.init({
-        proxy: "localhost/bulava-php/",
+        proxy: "localhost/tiu/",
         host: 'localhost',
         port: 9000,
     });
